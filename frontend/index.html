@@ -1,0 +1,563 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediVoice AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+  :root {
+    --bg: #0a0f0d;
+    --bg2: #0f1612;
+    --bg3: #141c18;
+    --bg4: #1a2420;
+    --teal: #00c896;
+    --teal2: #00a87d;
+    --teal3: #007a5a;
+    --teal-glow: rgba(0,200,150,0.15);
+    --teal-soft: rgba(0,200,150,0.08);
+    --red: #ff4f4f;
+    --red-soft: rgba(255,79,79,0.12);
+    --amber: #ffb347;
+    --blue: #4fa3ff;
+    --blue-soft: rgba(79,163,255,0.12);
+    --text: #e8f0ec;
+    --text2: #8fa89a;
+    --text3: #5a706a;
+    --border: rgba(0,200,150,0.12);
+    --border2: rgba(0,200,150,0.2);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem 3rem;
+    background-image: radial-gradient(ellipse at 20% 20%, rgba(0,200,150,0.04) 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 80%, rgba(0,168,125,0.03) 0%, transparent 60%);
+  }
+
+  .container { width: 100%; max-width: 700px; display: flex; flex-direction: column; gap: 1.25rem; }
+
+  /* ── Header ── */
+  .hdr {
+    text-align: center;
+    padding: 2rem 1rem 1.5rem;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    position: relative;
+    overflow: hidden;
+  }
+  .hdr::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: 50%;
+    transform: translateX(-50%);
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(0,200,150,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hdr-pulse {
+    width: 64px; height: 64px;
+    margin: 0 auto 1rem;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hdr-pulse::before, .hdr-pulse::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid var(--teal);
+    animation: ripple 2.5s ease-out infinite;
+  }
+  .hdr-pulse::after { animation-delay: 1.2s; }
+  @keyframes ripple {
+    0% { width: 64px; height: 64px; opacity: 0.6; }
+    100% { width: 110px; height: 110px; opacity: 0; }
+  }
+  .hdr-icon-inner {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--teal3), var(--teal2));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    box-shadow: 0 0 24px rgba(0,200,150,0.3);
+    z-index: 1;
+  }
+  .hdr h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px; font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+  .hdr h1 span { color: var(--teal); font-style: italic; }
+  .hdr p { font-size: 13px; color: var(--text2); margin-top: 4px; letter-spacing: 0.3px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase;
+    background: rgba(0,200,150,0.1); color: var(--teal);
+    border: 1px solid rgba(0,200,150,0.25);
+    border-radius: 20px; padding: 3px 10px; margin-top: 8px;
+  }
+  .badge::before { content: '●'; font-size: 7px; animation: blink 2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ── Status bar ── */
+  .sbar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 16px;
+  }
+  .sbar-left { display: flex; align-items: center; gap: 8px; }
+  .sdot { width: 8px; height: 8px; border-radius: 50%; background: var(--text3); transition: all .3s; }
+  .sdot.ok { background: var(--teal); box-shadow: 0 0 8px rgba(0,200,150,0.5); animation: glow 2s infinite; }
+  .sdot.listen { background: var(--teal); animation: glow-fast .6s infinite; }
+  .sdot.think { background: var(--amber); box-shadow: 0 0 8px rgba(255,179,71,0.5); }
+  .sdot.speak { background: var(--blue); box-shadow: 0 0 8px rgba(79,163,255,0.5); animation: glow-fast .7s infinite; }
+  .sdot.err { background: var(--red); box-shadow: 0 0 8px rgba(255,79,79,0.5); }
+  @keyframes glow { 0%,100%{opacity:1;box-shadow:0 0 8px rgba(0,200,150,0.5)} 50%{opacity:.7;box-shadow:0 0 14px rgba(0,200,150,0.8)} }
+  @keyframes glow-fast { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .sbar-txt { font-size: 12.5px; color: var(--text2); font-weight: 500; }
+
+  /* Stop button */
+  .btn-stop {
+    display: none; align-items: center; gap: 6px;
+    background: var(--red-soft); color: var(--red);
+    border: 1px solid rgba(255,79,79,0.3);
+    border-radius: 20px; padding: 5px 12px;
+    font-size: 11.5px; font-weight: 600; font-family: 'Outfit', sans-serif;
+    cursor: pointer; transition: all .2s; letter-spacing: 0.3px;
+  }
+  .btn-stop:hover { background: rgba(255,79,79,0.2); border-color: rgba(255,79,79,0.5); }
+  .btn-stop.visible { display: flex; }
+  .btn-stop svg { width: 10px; height: 10px; fill: var(--red); }
+
+  /* ── Category pills ── */
+  .pills {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 12px;
+  }
+  .pill {
+    font-size: 11.5px; font-weight: 500; padding: 6px 13px;
+    border-radius: 20px; border: 1px solid transparent;
+    background: transparent; color: var(--text2);
+    cursor: pointer; transition: all .2s; letter-spacing: 0.2px;
+  }
+  .pill:hover { background: var(--teal-soft); color: var(--teal); border-color: var(--border2); }
+  .pill.on { background: rgba(0,200,150,0.12); color: var(--teal); border-color: rgba(0,200,150,0.3); font-weight: 600; }
+
+  /* ── Chat ── */
+  .chat {
+    min-height: 320px; max-height: 420px;
+    overflow-y: auto;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.1rem;
+    display: flex; flex-direction: column; gap: 12px;
+    scroll-behavior: smooth;
+  }
+  .chat::-webkit-scrollbar { width: 4px; }
+  .chat::-webkit-scrollbar-track { background: transparent; }
+  .chat::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+  .msg { display: flex; gap: 9px; max-width: 88%; animation: msgIn .25s ease; }
+  @keyframes msgIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .msg.u { align-self: flex-end; flex-direction: row-reverse; }
+  .msg.b, .msg.em { align-self: flex-start; }
+
+  .av {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0; margin-top: 2px;
+  }
+  .b .av { background: rgba(0,200,150,0.12); border: 1px solid rgba(0,200,150,0.25); }
+  .u .av { background: var(--blue-soft); border: 1px solid rgba(79,163,255,0.25); }
+  .em .av { background: var(--red-soft); border: 1px solid rgba(255,79,79,0.25); }
+
+  .bub {
+    padding: 11px 15px; border-radius: 14px;
+    font-size: 14px; line-height: 1.65; max-width: 100%;
+  }
+  .b .bub { background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-top-left-radius: 4px; }
+  .u .bub { background: var(--blue-soft); border: 1px solid rgba(79,163,255,0.2); color: #c8deff; border-top-right-radius: 4px; }
+  .em .bub { background: var(--red-soft); border: 1px solid rgba(255,79,79,0.25); color: #ffc0c0; border-top-left-radius: 4px; }
+
+  .elabel {
+    font-size: 10.5px; font-weight: 700; color: var(--red);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  .dots { display: flex; gap: 5px; align-items: center; padding: 4px 2px; }
+  .dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); animation: bounce 1.3s infinite; }
+  .dots span:nth-child(2) { animation-delay: .2s; }
+  .dots span:nth-child(3) { animation-delay: .4s; }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+
+  /* ── Quick prompts ── */
+  .qrow { display: flex; gap: 6px; flex-wrap: wrap; }
+  .qb {
+    font-size: 11.5px; padding: 6px 12px;
+    border: 1px solid var(--border); border-radius: 20px;
+    background: var(--bg2); color: var(--text2);
+    cursor: pointer; transition: all .2s; font-family: 'Outfit', sans-serif;
+    font-weight: 400; letter-spacing: 0.2px;
+  }
+  .qb:hover { background: var(--teal-soft); color: var(--teal); border-color: var(--border2); transform: translateY(-1px); }
+
+  /* ── Input row ── */
+  .inp-wrap {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 10px;
+    display: flex; flex-direction: column; gap: 8px;
+    transition: border-color .2s;
+  }
+  .inp-wrap:focus-within { border-color: rgba(0,200,150,0.3); }
+
+  .inp-row { display: flex; gap: 8px; align-items: flex-end; }
+
+  .tinp {
+    flex: 1; padding: 8px 4px;
+    background: transparent; border: none; outline: none;
+    font-size: 14px; font-family: 'Outfit', sans-serif;
+    color: var(--text); resize: none; height: 36px; overflow: hidden;
+    line-height: 1.5;
+  }
+  .tinp::placeholder { color: var(--text3); }
+
+  .inp-actions { display: flex; gap: 7px; align-items: center; }
+
+  .btn-round {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all .2s; flex-shrink: 0;
+    font-size: 17px; border: none;
+  }
+
+  .btn-mic {
+    background: rgba(0,200,150,0.08);
+    border: 1px solid rgba(0,200,150,0.2) !important;
+    color: var(--teal);
+  }
+  .btn-mic:hover { background: rgba(0,200,150,0.15); }
+  .btn-mic.on {
+    background: var(--teal); color: #0a0f0d;
+    box-shadow: 0 0 20px rgba(0,200,150,0.4);
+    animation: mic-pulse 1s infinite;
+  }
+  @keyframes mic-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(0,200,150,.4)} 50%{box-shadow:0 0 0 10px rgba(0,200,150,0)} }
+
+  .btn-send {
+    background: linear-gradient(135deg, var(--teal2), var(--teal));
+    color: #0a0f0d; font-size: 15px;
+    box-shadow: 0 4px 16px rgba(0,200,150,0.25);
+  }
+  .btn-send:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,200,150,0.35); }
+  .btn-send:disabled { opacity: .35; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  .inp-hint {
+    font-size: 11px; color: var(--text3); padding: 0 4px;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .inp-sep { width: 1px; height: 20px; background: var(--border); }
+
+  /* ── Disclaimer ── */
+  .disc {
+    font-size: 11px; color: var(--text3); text-align: center;
+    padding: 10px 1rem 0; line-height: 1.6;
+    border-top: 1px solid var(--border);
+  }
+  .disc span { color: var(--teal); opacity: 0.7; }
+  </style>
+  </head>
+  <body>
+  <div class="container">
+
+    <!-- Header -->
+    <div class="hdr">
+      <div class="hdr-pulse">
+        <div class="hdr-icon-inner">🩺</div>
+      </div>
+      <h1>Medi<span>Voice</span> AI</h1>
+      <p>Intelligent Healthcare Voice Assistant</p>
+      <div class="badge">Made by Safwan</div>
+    </div>
+
+    <!-- Status bar -->
+    <div class="sbar">
+      <div class="sbar-left">
+        <div class="sdot ok" id="sd"></div>
+        <span class="sbar-txt" id="st">Ready to help you</span>
+      </div>
+      <button class="btn-stop" id="stopBtn" onclick="stopSpeaking()">
+        <svg viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" rx="1"/></svg>
+        Stop Speaking
+      </button>
+    </div>
+
+    <!-- Category pills -->
+    <div class="pills">
+      <div class="pill on" onclick="setPill(this,'general')">🩺 General</div>
+      <div class="pill" onclick="setPill(this,'symptoms')">🤒 Symptoms</div>
+      <div class="pill" onclick="setPill(this,'medication')">💊 Medication</div>
+      <div class="pill" onclick="setPill(this,'appointment')">📅 Appointments</div>
+      <div class="pill" onclick="setPill(this,'insurance')">🧾 Insurance</div>
+      <div class="pill" onclick="setPill(this,'emergency')">🚑 Emergency</div>
+    </div>
+
+    <!-- Chat -->
+    <div class="chat" id="chatBox">
+      <div class="msg b">
+        <div class="av">🩺</div>
+        <div class="bub">Namaste! I'm <strong>MediVoice</strong>, your personal AI healthcare assistant.<br><br>I can help you with <strong>symptom checking</strong>, <strong>medication guidance</strong>, <strong>appointment booking</strong>, <strong>insurance queries</strong>, and <strong>emergency support</strong>.<br><br>How are you feeling today? Type or tap the mic 🎙️ to speak.</div>
+      </div>
+    </div>
+
+    <!-- Quick prompts -->
+    <div class="qrow" id="qr">
+      <button class="qb" onclick="sq('I have fever and headache since yesterday')">🤒 Fever &amp; headache</button>
+      <button class="qb" onclick="sq('I have chest pain, is it serious?')">❤️ Chest pain</button>
+      <button class="qb" onclick="sq('Can I take paracetamol for fever?')">💊 Paracetamol</button>
+      <button class="qb" onclick="sq('Book a doctor appointment tomorrow')">📅 Appointment</button>
+      <button class="qb" onclick="sq('I feel dizzy and cannot breathe properly')">🚨 Emergency</button>
+    </div>
+
+    <!-- Input -->
+    <div class="inp-wrap">
+      <div class="inp-row">
+        <textarea class="tinp" id="ti" placeholder="Describe your symptoms or ask a health question..." onkeydown="hk(event)" oninput="autoResize(this)"></textarea>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="inp-hint">
+          <span>Press Enter to send</span>
+          <div class="inp-sep"></div>
+          <span>Shift+Enter for new line</span>
+        </div>
+        <div class="inp-actions">
+          <button class="btn-round btn-mic" id="micBtn" onclick="toggleVoice()" title="Click to speak">🎙️</button>
+          <button class="btn-round btn-send" id="sb" onclick="doSend()" title="Send">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1 8l13-7-4 7 4 7z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <p class="disc"><span>⚕️</span> MediVoice provides health information only — not a substitute for professional medical advice. Always consult a licensed doctor for diagnosis and treatment.</p>
+  </div>
+
+  <script>
+
+  let cat = 'general', hist = [], listening = false, rec = null;
+  let synth = window.speechSynthesis;
+  let isSpeaking = false;
+
+  const SYS = `You are MediVoice, a compassionate AI healthcare assistant helping patients. You assist with:
+  1. SYMPTOM CHECKING: Assess symptoms, triage severity, identify emergencies
+  2. MEDICATION SUPPORT: Dosage, timing, side effects, interactions
+  3. APPOINTMENT BOOKING: Schedule visits, find specialists
+  4. INSURANCE & BILLING: Coverage, claims, policy guidance
+  5. EMERGENCY HANDLING: Identify life-threatening situations immediately
+
+  RULES:
+  - Emergencies (severe chest pain + breathlessness, stroke, unconsciousness, severe bleeding): Start with "🚨 EMERGENCY ALERT:" and urge calling 112/108 immediately
+  - Be warm, empathetic, concise (3-5 sentences)
+  - Always recommend professional consultation for serious issues
+  - ALWAYS reply in English only. Never reply in Hindi or any other language, even if the user writes in Hindi
+  - Use emojis: 🩺💊📅🚑🧾`;
+
+  const QMAP = {
+    general:[['🤒 Fever & headache','I have fever and headache since yesterday'],['😴 Fatigue','I have been feeling very tired and weak for 3 days'],['🤧 Cold & cough','I have runny nose and sore throat since morning']],
+    symptoms:[['❤️ Chest pain','I have chest pain, is it serious?'],['🤢 Nausea','I have been feeling nauseous and vomiting since last night'],['🦴 Joint pain','My knees and joints hurt a lot, what could it be?']],
+    medication:[['💊 Paracetamol','Can I take paracetamol for fever?'],['⏰ Antibiotics','When and how should I take my antibiotics?'],['⚠️ Drug interaction','Can I take ibuprofen with blood pressure medicine?']],
+    appointment:[['📅 Book tomorrow','Book a doctor appointment for tomorrow'],['👨‍⚕️ Find specialist','I need a cardiologist, can you help?'],['🗓️ Upcoming','Do I have any upcoming appointments?']],
+    insurance:[['🧾 Coverage','Is my surgery covered by insurance?'],['💰 Claim','How do I file an insurance claim?'],['📋 Policy','What does my health insurance cover?']],
+    emergency:[['🚨 Breathless','I feel dizzy and cannot breathe properly'],['❤️ Heart attack','Severe chest pain spreading to my left arm'],['🧠 Stroke','My face is drooping and I cannot lift my arm']]
+  };
+
+  function autoResize(el) {
+    el.style.height = '36px';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  function setStatus(state, txt) {
+    document.getElementById('sd').className = 'sdot ' + (state || 'ok');
+    document.getElementById('st').textContent = txt;
+    const stopBtn = document.getElementById('stopBtn');
+    if (state === 'speak') stopBtn.classList.add('visible');
+    else stopBtn.classList.remove('visible');
+  }
+
+  function stopSpeaking() {
+    if (synth) synth.cancel();
+    isSpeaking = false;
+    setStatus('ok', 'Ready to help you');
+  }
+
+  function setPill(el, c) {
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
+    el.classList.add('on'); cat = c;
+    const qr = document.getElementById('qr');
+    qr.innerHTML = '';
+    (QMAP[c] || QMAP.general).forEach(([lbl, q]) => {
+      const b = document.createElement('button');
+      b.className = 'qb'; b.textContent = lbl; b.onclick = () => sq(q);
+      qr.appendChild(b);
+    });
+  }
+
+  function addMsg(role, text) {
+    const box = document.getElementById('chatBox');
+    const isEmerg = /🚨\s*EMERGENCY ALERT/i.test(text);
+    const div = document.createElement('div');
+    div.className = 'msg ' + (role === 'user' ? 'u' : isEmerg ? 'em' : 'b');
+    let content = text;
+    if (isEmerg) content = '<div class="elabel">🚨 Emergency Alert</div>' + text.replace(/🚨\s*EMERGENCY ALERT:\s*/i, '');
+    div.innerHTML = `<div class="av">${role==='user'?'👤':'🩺'}</div><div class="bub">${content}</div>`;
+    box.appendChild(div); box.scrollTop = box.scrollHeight;
+  }
+
+  function addTyping() {
+    const box = document.getElementById('chatBox');
+    const d = document.createElement('div');
+    d.className = 'msg b'; d.id = 'typing';
+    d.innerHTML = '<div class="av">🩺</div><div class="bub"><div class="dots"><span></span><span></span><span></span></div></div>';
+    box.appendChild(d); box.scrollTop = box.scrollHeight;
+  }
+  function rmTyping() { const t = document.getElementById('typing'); if(t) t.remove(); }
+
+  async function callGroq(userMsg) {
+  hist.push({ role: 'user', content: userMsg });
+
+  const messages = [
+    { role: 'system', content: SYS + '\nCurrent focus: ' + cat.toUpperCase() },
+    ...hist
+  ];
+
+  const res = await fetch('http://localhost:3000/chat', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages,
+      max_tokens: 800,
+      temperature: 0.7
+    })
+  });
+
+  if (!res.ok) {
+    const e = await res.json();
+    throw new Error(e.error || 'API error');
+  }
+
+  const data = await res.json();
+  const reply = data.choices[0].message.content;
+
+  hist.push({ role: 'assistant', content: reply });
+
+  return reply;   // 🔥 MOST IMPORTANT
+}
+
+  async function doSend(txt) {
+    const ti = document.getElementById('ti');
+    const msg = (txt || ti.value).trim();
+    if (!msg) return;
+    ti.value = ''; ti.style.height = '36px';
+    addMsg('user', msg);
+    addTyping();
+    setStatus('think', 'Analyzing your query...');
+    document.getElementById('sb').disabled = true;
+    try {
+      const reply = await callGroq(msg);
+      rmTyping(); addMsg('bot', reply);
+      setStatus('ok', 'Ready to help you');
+      speak(reply);
+    } catch(e) {
+      rmTyping();
+      addMsg('bot', '⚠️ Error: ' + e.message);
+      setStatus('err', 'Connection error');
+      setTimeout(() => setStatus('ok', 'Ready to help you'), 3000);
+    }
+    document.getElementById('sb').disabled = false;
+  }
+
+  function sq(q) { document.getElementById('ti').value = q; doSend(q); }
+  function hk(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend();} }
+
+  function speak(text) {
+    if (!synth) return;
+    synth.cancel();
+    const clean = text.replace(/[🩺💊📅🚑🧾🚨⚕️❤️🤒😴🤧🦴🤢👤✅⚠️📋💰🧾🗓️👨‍⚕️]/g,'').replace(/\*\*/g,'').replace(/\*/g,'').trim();
+    const short = clean.length > 350 ? clean.substring(0,350)+'...' : clean;
+    const u = new SpeechSynthesisUtterance(short);
+    u.rate=0.93; u.pitch=1.05; u.volume=1;
+    const voices = synth.getVoices();
+    const v = voices.find(v=>v.lang==='en-IN'&&v.name.toLowerCase().includes('female'))
+      || voices.find(v=>v.lang==='en-IN')
+      || voices.find(v=>v.lang==='en-US'&&v.name.toLowerCase().includes('female'))
+      || voices.find(v=>v.lang.startsWith('en'))
+      || voices[0];
+    if(v) u.voice=v;
+    isSpeaking = true;
+    setStatus('speak','Speaking — tap Stop to cancel');
+    u.onend = () => { isSpeaking = false; setStatus('ok','Ready to help you'); };
+    u.onerror = () => { isSpeaking = false; setStatus('ok','Ready to help you'); };
+    synth.speak(u);
+  }
+
+  function toggleVoice() {
+    if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
+      addMsg('bot','🎙️ Voice input requires Chrome or Edge browser.'); return;
+    }
+    if(listening){rec.stop();return;}
+    if(isSpeaking){ synth.cancel(); isSpeaking=false; }
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    rec=new SR(); rec.lang='en-IN'; rec.interimResults=true; rec.continuous=false;
+    rec.onstart=()=>{
+      listening=true;
+      document.getElementById('micBtn').classList.add('on');
+      document.getElementById('micBtn').textContent='🔴';
+      document.getElementById('ti').placeholder='Listening... speak now';
+      setStatus('listen','Listening...');
+    };
+    rec.onresult=(e)=>{
+      const t=Array.from(e.results).map(r=>r[0].transcript).join('');
+      document.getElementById('ti').value=t;
+      if(e.results[e.results.length-1].isFinal){
+        listening=false;
+        document.getElementById('micBtn').classList.remove('on');
+        document.getElementById('micBtn').textContent='🎙️';
+        document.getElementById('ti').placeholder='Describe your symptoms or ask a health question...';
+        setTimeout(()=>doSend(t),300);
+      }
+    };
+    rec.onerror=(e)=>{
+      listening=false;
+      document.getElementById('micBtn').classList.remove('on');
+      document.getElementById('micBtn').textContent='🎙️';
+      document.getElementById('ti').placeholder='Describe your symptoms or ask a health question...';
+      if(e.error==='not-allowed') addMsg('bot','🎙️ Microphone access denied. Allow mic permissions in browser settings.');
+      setStatus('err','Mic error'); setTimeout(()=>setStatus('ok','Ready to help you'),2000);
+    };
+    rec.onend=()=>{
+      listening=false;
+      document.getElementById('micBtn').classList.remove('on');
+      document.getElementById('micBtn').textContent='🎙️';
+      document.getElementById('ti').placeholder='Describe your symptoms or ask a health question...';
+    };
+    rec.start();
+  }
+
+  if(synth) synth.onvoiceschanged=()=>synth.getVoices();
+  </script>
+  </body>
+  </html>
